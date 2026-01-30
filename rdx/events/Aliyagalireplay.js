@@ -7,57 +7,58 @@ const ADMIN_ID = "61550534939001";
 // state file
 const statePath = path.join(__dirname, "aliya_state.json");
 if (!fs.existsSync(statePath)) {
-  fs.writeFileSync(statePath, JSON.stringify({ on: false }));
+  fs.writeFileSync(statePath, JSON.stringify({ on: false }, null, 2));
 }
 
 // ===== REPLIES =====
 
-// user ke liye gali (HAR MESSAGE)
-const galiReplies = [
-  "LAND BHAKT 
-
-ABE XHUP BE TERI MAKI CHUT",
-  "ABE CHALA JA BHOSDIKE LAND BHAKT",
-  "IDHAR KYO APNI MA CHUDWA RHA LAND BHAKT",
-  "TERI BHAN KI CHUT KA PRIZE BTA LAND BHAKT ",
-  "TERI BHANN TOP KI RNDI HENA LANDBHAKT ",
-  "TERI BHANN KA GANG REP KRWA DUNGI LAND BHAKT",
-"TERI GAND ME LODA HE KYA RNDI KE",
-"TERI BHAN KA BHOSDA LAND BHKT",
-"TERI BHAN KI BACHEDANI FAD KE BAXHA NIKAL LUNGI  LANDBHAKT ",
+// GROUP replies (thoda hard)
+const groupReplies = [
+  "Abe chup re bhai 😑",
+  "Group me bakchodi mat kar 🙄",
+  "Dimag thanda rakh 😤",
+  "Zyada hero mat ban 😒",
+  "Bas kar bhai 😐"
 ];
 
-// admin / owner ke liye ache replies
+// INBOX replies (soft / warning)
+const inboxReplies = [
+  "Inbox me shanti rakho 🙂",
+  "Direct message dhang se bhejo 😌",
+  "Please normal baat karo ✨",
+  "Spam mat karo inbox me 🤏"
+];
+
+// admin replies
 const adminReplies = [
   "Ji boss 😎",
-  "Owner ke liye ALIYA hamesha ready 💖",
+  "Owner ke liye ALIYA ready 💖",
   "Bolo sir ✨"
 ];
 
 module.exports = {
   config: {
-    name: "aliyagalireply",
+    name: "aliyareply",
     eventType: "message"
   },
 
   async run({ api, event }) {
     try {
-      const { body, senderID, threadID, messageID } = event;
+      const { body, senderID, threadID, messageID, isGroup } = event;
       if (!body) return;
 
       const msg = body.toLowerCase().trim();
-      const state = JSON.parse(fs.readFileSync(statePath));
+      const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
 
-      // ❌ bot khud ko reply na kare
+      // bot self-reply block
       if (senderID === api.getCurrentUserID()) return;
 
-      // ================= ADMIN =================
+      // ============== ADMIN ==============
       if (senderID === ADMIN_ID) {
 
-        // ON
         if (msg === "aliya on") {
           state.on = true;
-          fs.writeFileSync(statePath, JSON.stringify(state));
+          fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
           return api.sendMessage(
             "✦ Official ALIYA ✦\n\n😈 MODE ON",
             threadID,
@@ -65,10 +66,9 @@ module.exports = {
           );
         }
 
-        // OFF
         if (msg === "aliya off") {
           state.on = false;
-          fs.writeFileSync(statePath, JSON.stringify(state));
+          fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
           return api.sendMessage(
             "✦ Official ALIYA ✦\n\n🙂 MODE OFF",
             threadID,
@@ -76,7 +76,6 @@ module.exports = {
           );
         }
 
-        // admin normal message
         if (!state.on) return;
 
         const adminReply =
@@ -89,23 +88,33 @@ module.exports = {
         );
       }
 
-      // ================= USER =================
-
-      // bot off hai
+      // ============== USERS ==============
       if (!state.on) return;
 
-      // USER ke HAR message pe gali
-      const reply =
-        galiReplies[Math.floor(Math.random() * galiReplies.length)];
+      // GROUP
+      if (isGroup) {
+        const reply =
+          groupReplies[Math.floor(Math.random() * groupReplies.length)];
+
+        return api.sendMessage(
+          `✦ Official ALIYA ✦\n\n${reply}`,
+          threadID,
+          messageID
+        );
+      }
+
+      // INBOX (DM)
+      const inboxReply =
+        inboxReplies[Math.floor(Math.random() * inboxReplies.length)];
 
       return api.sendMessage(
-        `✦ Official ALIYA ✦\n\n${reply}`,
+        `✦ Official ALIYA ✦\n\n${inboxReply}`,
         threadID,
         messageID
       );
 
     } catch (err) {
-      console.log("[ALIYA ERROR]:", err.message);
+      console.log("[ALIYA ERROR]:", err);
     }
   }
 };

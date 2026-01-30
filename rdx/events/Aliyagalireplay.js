@@ -14,11 +14,11 @@ if (!fs.existsSync(statePath)) {
 
 // GROUP replies (thoda hard)
 const groupReplies = [
-  "Abe chup re bhai 😑",
-  "Group me bakchodi mat kar 🙄",
-  "Dimag thanda rakh 😤",
-  "Zyada hero mat ban 😒",
-  "Bas kar bhai 😐"
+  "TERI MAA KI CHUTYTTT",
+  "Teri bhannn ka bhosda bhanxhod🙄",
+  "Sassti rndi ka baxha😤",
+  "Teri bhann ki chut nilamm. Kar dungi😒",
+  "TERI BHANN KA BHOSRA BAAT KHTAM😐"
 ];
 
 // INBOX replies (soft / warning)
